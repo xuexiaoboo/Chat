@@ -1,17 +1,14 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import chatListRouter from './chatList'
-import friendsListRouter from './friendsList'
-import watchRouter from './watch'
+import homeRouter from './home'
 import loginRouter from './login'
 
 Vue.use(VueRouter)
 
 const routes = [
-    chatListRouter,
-    friendsListRouter,
-    watchRouter,
-    loginRouter
+    homeRouter,
+    loginRouter,
+    // { path: '/*', redirect: '/login' }
 ]
 
 const router = new VueRouter({
