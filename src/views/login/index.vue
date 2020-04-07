@@ -42,8 +42,8 @@ export default {
     return {
       // 登录表单绑定对象
       loginForm: {
-        username: "",
-        password: ""
+        username: "admin",
+        password: "123456"
       },
       // 登录表单验证规则
       loginFormRules: {
@@ -81,6 +81,9 @@ export default {
           .then(res => {
             var status = res.data.status;
             if (status === 0) {
+              // 登录时保存用户信息，之后页面方便使用，，vuex的方式在页面刷新会丢失
+              // this.$store.commit('user/USER_NAME', { name: res.data.data.username })
+              sessionStorage.setItem('username', res.data.data.username)
               this.$message.success("登录成功");
               this.$router.replace("/home");
             }
@@ -93,7 +96,7 @@ export default {
 
     // 注册
     register() {
-      
+      this.$router.push("/register")
     }
   }
 };

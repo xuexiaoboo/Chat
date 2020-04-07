@@ -1,0 +1,48 @@
+.chatBox {
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+
+/* 在线用户列表 */
+
+.chatBox .connectedList {
+    width: 27%;
+    border: 3px solid darkmagenta;
+}
+
+
+/* 聊天部分 */
+
+.chatBox .chatBody {
+    border: 3px solid darkturquoise;
+    width: 73%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.chatBox .chatBody #chatMsgBox {
+    border: 3px solid red;
+    height: 480px;
+    margin-bottom: 40px;
+    overflow: auto;
+}
+
+.chatBox .chatBody p {
+    text-align: center;
+}
+
+.chatBox .chatBody .sendBox {
+    width: 97%;
+    /* position: absolute; */
+    border: 3px solid darkorange;
+    display: flex;
+    padding: 10px 10px;
+    /* bottom: 0; */
+}
+
+.sendBox .sendBtn {
+    margin-left: 10px;
+}
