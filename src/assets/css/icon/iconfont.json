@@ -1,0 +1,16 @@
+{
+  "id": "1769752",
+  "name": "chat",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon",
+  "description": "xxb  毕业设计",
+  "glyphs": [
+    {
+      "icon_id": "1509759",
+      "name": "笑脸",
+      "font_class": "smile",
+      "unicode": "e673",
+      "unicode_decimal": 58995
+    }
+  ]
+}

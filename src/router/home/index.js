@@ -17,6 +17,16 @@ export default {
             path: '/chat',
             component: () =>
                 import ('@/components/Chat')
+        },
+        {
+            path: '/watch',
+            component: () =>
+                import ('@/components/Watch')
+        },
+        {
+            path: '/try',
+            component: () =>
+                import ('@/components/Try')
         }
     ]
 }

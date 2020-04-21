@@ -28,13 +28,13 @@
               <span>来聊啊</span>
             </template>
           </el-menu-item>
-          <el-menu-item index="watch" @click="saveNavState('/watch')">
+          <el-menu-item index="/watch" @click="saveNavState('/watch')">
             <template slot="title">
               <i class="el-icon-crop"></i>
               <span>来看呐</span>
             </template>
           </el-menu-item>
-          <el-menu-item index @click="saveNavState('')">
+          <el-menu-item index="/try" @click="saveNavState('/try')">
             <template slot="title">
               <i class="el-icon-location"></i>
               <span>待定啊</span>
@@ -55,7 +55,7 @@
       <!-- 首页内容区域 -->
       <el-main>
         <!-- 二级路由占位 -->
-        <router-view></router-view>
+        <router-view :ws="ws"></router-view>
       </el-main>
     </el-container>
   </el-container>
@@ -67,7 +67,9 @@ export default {
     return {
       username: sessionStorage.getItem("username"),
 
-      pickPath: ""
+      pickPath: "",
+
+      ws: new WebSocket("ws://localhost:2333"),
     };
   },
 
@@ -76,11 +78,10 @@ export default {
   },
 
   mounted() {
-    
   },
 
   destroyed() {
-    
+    this.ws.close()
   },
 
   methods: {

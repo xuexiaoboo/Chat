@@ -1,10 +1,10 @@
 const state = {
-    name: ''
+    onlineusers: []
 }
 
 const mutations = {
-    USER_NAME(state, payload) {
-        state.name = payload.name
+    ONLINE_USERS(state, payload) {
+        state.onlineusers.push(payload.name)
     }
 }
 

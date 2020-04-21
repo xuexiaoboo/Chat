@@ -12,7 +12,7 @@ const routes = [
     homeRouter,
     loginRouter,
     registerRouter,
-    // { path: '/*', redirect: '/login' }
+    { path: '/*', redirect: '/login' }
 ]
 
 
