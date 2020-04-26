@@ -9,6 +9,13 @@
 
 .chatBox .connectedList {
     width: 27%;
+    position: relative;
+}
+
+.chatBox .connectedList .userInfo {
+    position: absolute;
+    top: 10%;
+    left: 108%;
 }
 
 .chatBox .connectedList .box-card {
@@ -152,6 +159,9 @@
     position: relative;
 }
 
+
+/* 发送图片 */
+
 .chatBox .chatBody #toolBar .upImgBox {
     position: relative;
     margin-right: 10px;
@@ -171,7 +181,33 @@
     font-size: 27px;
 }
 
+
+/* 发送表情 */
+
 .chatBox .chatBody #toolBar .iconsmile {
+    font-size: 27px;
+    margin-right: 10px;
+}
+
+
+/* 发送文件 */
+
+.chatBox .chatBody #toolBar .upFileBox {
+    position: relative;
+    margin-right: 10px;
+}
+
+.chatBox .chatBody #toolBar .upFileBox .upFile {
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 0;
+    height: 100%;
+    width: 100%;
+    cursor: pointer;
+}
+
+.chatBox .chatBody #toolBar .upFileBox .upFileBtn {
     font-size: 27px;
 }
 

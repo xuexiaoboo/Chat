@@ -1,5 +1,5 @@
 <template>
-  <div class="EmoticonListCover" v-show="isShow" @click="OpenEmotion()">
+  <div class="EmoticonListCover">
     <div class="EmoticonList">
       <div
         class="PicItem"
@@ -20,7 +20,7 @@ export default {
   name: "Emoji",
   data() {
     return {
-      isShow: false,
+      // isShow: false,
       EmotionList: [
         "微笑",
         "撇嘴",
@@ -133,16 +133,16 @@ export default {
   methods: {
     // 选中表情
     ClickEmoticon(EmoticonNo) {
+      // this.isShow = false;
       this.$emit("AppendInputValue", {
         emoji: "[[" + this.EmotionList[EmoticonNo] + "]]",
         emojiUrl: 'https://res.wx.qq.com/mpres/htmledition/images/icon/emotion/' + EmoticonNo + '.gif',
       });
-      this.isShow = false;
     },
     //   点击弹出表情组件
-    OpenEmotion() {
-      this.isShow = !this.isShow;
-    }
+  //   OpenEmotion() {
+  //     this.isShow = !this.isShow;
+  //   }
   }
 };
 </script>

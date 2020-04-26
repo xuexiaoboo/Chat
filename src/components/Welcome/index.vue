@@ -1,6 +1,6 @@
 <template>
   <div class="wel-container">
-      <p>{{ username }} 你干哈来啦..</p>
+      <p>Welcome...</p>
   </div>
 </template>
 

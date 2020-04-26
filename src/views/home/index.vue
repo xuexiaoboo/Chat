@@ -25,31 +25,31 @@
           <el-menu-item index="/chat" @click="saveNavState('/chat')">
             <template slot="title">
               <i class="el-icon-chat-line-square"></i>
-              <span>来聊啊</span>
+              <span>聊天</span>
             </template>
           </el-menu-item>
-          <el-menu-item index="/watch" @click="saveNavState('/watch')">
+          <!-- <el-menu-item index="/watch" @click="saveNavState('/watch')">
             <template slot="title">
               <i class="el-icon-crop"></i>
               <span>来看呐</span>
             </template>
-          </el-menu-item>
-          <el-menu-item index="/try" @click="saveNavState('/try')">
-            <template slot="title">
-              <i class="el-icon-location"></i>
-              <span>待定啊</span>
-            </template>
-          </el-menu-item>
+          </el-menu-item> -->
           <!-- 一级菜单 -->
           <el-submenu index="4">
             <template slot="title">
               <i class="el-icon-star-off"></i>
-              <span>来玩啊</span>
+              <span>玩耍</span>
             </template>
             <!-- 二级菜单 -->
             <el-menu-item index="/game1" @click="saveNavState('/game1')">2048</el-menu-item>
             <el-menu-item index>~没做~</el-menu-item>
           </el-submenu>
+          <el-menu-item index="/try" @click="saveNavState('/try')">
+            <template slot="title">
+              <i class="el-icon-location"></i>
+              <span>Demo</span>
+            </template>
+          </el-menu-item>
         </el-menu>
       </el-aside>
       <!-- 首页内容区域 -->

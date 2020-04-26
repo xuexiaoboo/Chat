@@ -4,14 +4,21 @@
     <div class="connectedList">
       <el-card class="box-card">
         <div slot="header" class="clearfix selectuser">
-          <el-input placeholder="你想找谁？？" v-model="selectUser"></el-input>
-          <el-button type="primary" @click="getUserInfo">搜索</el-button>
+          <el-input
+            placeholder="你想找谁？？"
+            v-model="selectUser"
+            @keyup.enter.native="showUserInfo(selectUser)"
+          ></el-input>
+          <el-button type="primary" @click="showUserInfo(selectUser)">搜索</el-button>
         </div>
         <!-- 在线用户List -->
         <el-card shadow="hover" v-for="(item, key) in onlineUsers" :key="key" class="onlineUser">
           <div @click="showUserInfo(item)">{{ item }}</div>
         </el-card>
       </el-card>
+
+      <!-- 用户信息展示 -->
+      <UserInfo class="userInfo" ref="userInfo" :userInfo="userInfo" :onlineState="onlineState"></UserInfo>
     </div>
     <!-- 聊天部分 -->
     <div class="chatBody">
@@ -41,9 +48,16 @@
           />
           <el-button type="text" class="upImgBtn" icon="el-icon-picture-outline"></el-button>
         </div>
+
         <!-- emoji -->
         <el-button type="text" class="iconfont iconsmile" @click="OpenEmotions"></el-button>
-        <Emoji ref="emoji" @AppendInputValue="AppendMessageText"></Emoji>
+        <Emoji ref="emoji" @AppendInputValue="AppendMessageText" v-show="isShowEmoji"></Emoji>
+
+        <!-- 文件发送 -->
+        <div class="upFileBox" ref="upFileBox">
+          <input type="file" class="upFile" @change="upFile" />
+          <el-button icon="el-icon-folder" type="text" class="upFileBtn"></el-button>
+        </div>
       </div>
       <!-- 消息发送部分 -->
       <div class="sendBox">
@@ -55,13 +69,15 @@
 </template>
 
 <script>
-import Emoji from "./components/Emoji/index";
+import Emoji from "./components/Emoji";
+import UserInfo from "./components/UserInfo";
 
 export default {
   props: ["ws"],
 
   components: {
-    'Emoji': Emoji
+    Emoji: Emoji,
+    UserInfo: UserInfo
   },
 
   data() {
@@ -70,12 +86,18 @@ export default {
       selectUser: "",
 
       onlineUsers: null,
+      userInfo: null,
+      onlineState: "",
 
       chatList: [],
       imgBase64: [],
       fileValue: "",
 
       emojiInfo: new Map(),
+      isShowEmoji: false,
+
+      fileContent: '',
+      fileName: '',
 
       username: window.sessionStorage.getItem("username")
     };
@@ -124,15 +146,18 @@ export default {
     // 发送消息
     sendMsg() {
       // 正则筛选emoji
-      var reg = new RegExp(/\[\[[\u4e00-\u9fa5]{1,3}\]\]/g)
-      var sendEmojisName = this.msg.match(reg)
+      var reg = new RegExp(/\[\[[\u4e00-\u9fa5]{1,3}\]\]/g);
+      var sendEmojisName = this.msg.match(reg);
       // var sendEmojisUrl = sendEmojisName.forEach((item, index) => {
       //   sendEmojisName[index] = this.emojiInfo.get(item)
       // })
-      if(sendEmojisName) {
-        for(var i = 0; i < sendEmojisName.length; i++) {
-        this.msg = this.msg.replace(sendEmojisName[i], `<img src='${this.emojiInfo.get(sendEmojisName[i])}'>`)
-      }
+      if (sendEmojisName) {
+        for (var i = 0; i < sendEmojisName.length; i++) {
+          this.msg = this.msg.replace(
+            sendEmojisName[i],
+            `<img src='${this.emojiInfo.get(sendEmojisName[i])}'>`
+          );
+        }
       }
 
       // new WebSocket创建连接后会触发ws.onopen方法，这里是分开写的，所以，直接调用send给服务端发送
@@ -166,8 +191,11 @@ export default {
 
     // 展示用户信息
     showUserInfo(username) {
-      if (!username) {
+      if (username === "") {
         username = this.selectUser;
+      }
+      if (username === "") {
+        return;
       }
       // 获取用户信息
       this.$http
@@ -177,14 +205,25 @@ export default {
           }
         })
         .then(res => {
-          // var status = res.data.status
-          // if(status)
-          console.log(res);
+          var status = res.data.status;
+          if (status !== 0) {
+            this.selectUser = "";
+            return this.$message.error("获取用户信息失败/该用户不存在");
+          }
+          this.userInfo = res.data;
+
+          // 展示资料卡
+          this.$refs.userInfo.isShow = !this.$refs.userInfo.isShow;
+          // console.log(this.onlineUsers);
+
+          if (this.onlineUsers.indexOf(username) !== -1) {
+            this.onlineState = "[ 在线 ]";
+          } else {
+            this.onlineState = "[ 不在线 ]";
+          }
+          this.selectUser = "";
         });
     },
-
-    // 用户资料卡
-    getUserInfo() {},
 
     // 上传图片转base64
     ImageToBase64() {
@@ -211,13 +250,40 @@ export default {
 
     // 打开表情包弹框
     OpenEmotions() {
-      this.$refs.emoji.OpenEmotion();
+      // this.$refs.emoji.OpenEmotion();
+      this.isShowEmoji = !this.isShowEmoji;
     },
 
     //表情选中后追加在input并保存选中表情，用来传给后端
     AppendMessageText(EmotionChinese) {
+      this.isShowEmoji = !this.isShowEmoji;
       this.msg += EmotionChinese.emoji;
-      this.emojiInfo.set(EmotionChinese.emoji, EmotionChinese.emojiUrl)
+      this.emojiInfo.set(EmotionChinese.emoji, EmotionChinese.emojiUrl);
+    },
+
+    // 文件发送-选择文件
+    upFile(e) {
+      let file = e.target.files;
+      this.fileName = file.name
+      if (file.length === 0) {
+        return;
+      }
+      let reader = new FileReader();
+      if (typeof FileReader === "undefined") {
+        this.$message.info('您的浏览器不支持FileReader接口')
+        return;
+      }
+      reader.readAsText(file[0]);
+      reader.onload = function(e) {
+        console.log("文件内容");
+        console.log(e.target.result);
+        this.fileContent = e.target.result
+
+
+        const blob = new Blob([this.fileContent], {type : 'text/plain'})
+        var url = URL.createObjectURL(blob)
+        console.log(url)
+      };
     }
   }
 };

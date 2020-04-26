@@ -1,10 +1,12 @@
 <template>
   <div>
-    <input type="file" :value="fileValue" id="upImageFile" @change="ImageToBase64" />
-    <img v-for="(url, index) in iconBase64" :key="index" :src="url" alt width="200" />
+    <!-- <div @click="download">下载</div> -->
+    <input type="file" @change="upFile" id="upFile"/>
+    <a href id="download">
+      <div class="downloadBtn"></div>
+    </a>
 
-    <img src="https://res.wx.qq.com/mpres/htmledition/images/icon/emotion/0.gif" />
-    <img src="https://res.wx.qq.com/mpres/htmledition/images/icon/emotion/1.gif" />
+    <!-- 截屏 -->
   </div>
 </template>
 
@@ -13,7 +15,10 @@ export default {
   data() {
     return {
       fileValue: "",
-      iconBase64: []
+      iconBase64: [],
+
+      fileContent: {},
+      fileName: '',
     };
   },
 
@@ -29,10 +34,47 @@ export default {
       reader.onerror = function(error) {
         console.log("Error: ", error);
       };
+    },
+
+    upFile(e) {
+      let file = e.target.files;
+      if (file.length === 0) {
+        return;
+      }
+      this.fileName = file[0].name
+      console.log('fileName:'+this.fileName)
+      let reader = new FileReader();
+      if (typeof FileReader === "undefined") {
+        this.$message.info("您的浏览器不支持FileReader接口");
+        return;
+      }
+      reader.readAsArrayBuffer(file[0]);
+      reader.onload = function(e) {
+        console.log("文件内容");
+        console.log(e.target.result);
+        this.fileContent = e.target.result;
+        console.log('aaa:'+this.fileContent)
+
+        let blob = new Blob([this.fileContent], {type: 'application/octet-stream;charset=UTF-8'});
+        let blobUrl = URL.createObjectURL(blob);
+        let a = document.getElementById("download");
+        a.href = blobUrl;
+        a.download = this.fileName;
+      }.bind(this);
     }
   }
 };
 </script>
 
 <style scoped>
+#download {
+  text-decoration: none;
+}
+#download .downloadBtn {
+  width: 100px;
+  height: 50px;
+  border: 1px solid #000;
+  text-align: center;
+  line-height: 50px;
+}
 </style>
