@@ -22,13 +22,32 @@
     </div>
     <!-- 聊天部分 -->
     <div class="chatBody">
+      <!-- 视频提示 -->
+      <!-- <div class="videoNotify">有用户正在进行视频通话</div> -->
       <div id="chatMsgBox">
         <div v-for="(item, index) in chatList" :key="index" :class="item.type">
           <!-- 头像 -->
           <div class="avatar">{{ item.username }}</div>
           <!-- 消息 -->
           <div class="msg">
+            <!-- 图片信息 -->
             <img v-if="item.isImg" :src="item.msg" alt width="200" />
+            <!-- 文件信息 -->
+            <a
+              v-else-if="item.isFile"
+              :href="item.msg"
+              :download="item.fileName"
+              :title="item.fileName"
+              style="text-decoration: none;"
+            >
+              <div class="download" style="display: flex">
+                <div
+                  style="margin-right: 5px; padding-top: 3px; width: 120px; overflow: hidden;"
+                >{{ item.fileName }}</div>
+                <el-button icon="el-icon-download" type="text" style="font-size: 27px; padding: 0"></el-button>
+              </div>
+            </a>
+            <!-- 普通信息 -->
             <p v-else v-html="item.msg">
               <!-- {{ item.msg }} -->
             </p>
@@ -56,8 +75,26 @@
         <!-- 文件发送 -->
         <div class="upFileBox" ref="upFileBox">
           <input type="file" class="upFile" @change="upFile" />
-          <el-button icon="el-icon-folder" type="text" class="upFileBtn"></el-button>
+          <el-button icon="el-icon-folder-opened" type="text" class="upFileBtn"></el-button>
         </div>
+
+        <!-- 聊天记录 -->
+        <el-button
+          icon="el-icon-chat-dot-round"
+          type="text"
+          class="chatRecordBtn"
+          @click="showChatRecord"
+        ></el-button>
+        <ChatRecord ref="chatRecord" class="chatRecordBox" :chatList="chatList"></ChatRecord>
+
+        <!-- 音视频 -->
+        <el-button
+          class="videoCallBtn"
+          icon="el-icon-video-camera"
+          type="text"
+          @click="showVideoCall"
+        ></el-button>
+        <VideoCall ref="videoCall" class="videoCallBox" :ws="ws"></VideoCall>
       </div>
       <!-- 消息发送部分 -->
       <div class="sendBox">
@@ -71,13 +108,17 @@
 <script>
 import Emoji from "./components/Emoji";
 import UserInfo from "./components/UserInfo";
+import ChatRecord from "./components/ChatRecord";
+import VideoCall from "./components/VideoCall";
 
 export default {
   props: ["ws"],
 
   components: {
     Emoji: Emoji,
-    UserInfo: UserInfo
+    UserInfo: UserInfo,
+    ChatRecord: ChatRecord,
+    VideoCall: VideoCall
   },
 
   data() {
@@ -96,8 +137,13 @@ export default {
       emojiInfo: new Map(),
       isShowEmoji: false,
 
-      fileContent: '',
-      fileName: '',
+      // 文件发送
+      fileContent: {},
+      fileName: "",
+      fileUrl: [],
+
+      // 音视频提醒
+      video: false,
 
       username: window.sessionStorage.getItem("username")
     };
@@ -121,6 +167,10 @@ export default {
 
       switch (data.type) {
         case "sysInfo":
+          if (data.video) {
+            this.$notify.info({ message: "有用户正在使用视频通话" });
+            break;
+          }
           this.chatList.push(data);
           this.onlineUsers = data.onlineUsers;
           break;
@@ -128,9 +178,6 @@ export default {
         case "chatMsg":
           if (data.username === this.username) {
             data.type = "myMsg";
-            // if(data.img) {
-            //   this.imgBase64.push(data)
-            // }
             this.chatList.push(data);
           } else {
             data.type = "anotherMsg";
@@ -138,6 +185,8 @@ export default {
           }
           this.msg = "";
           break;
+        // default:
+        //   this.$notify.info({message: '有用户正在进行视频通话'})
       }
     }.bind(this);
   },
@@ -264,26 +313,49 @@ export default {
     // 文件发送-选择文件
     upFile(e) {
       let file = e.target.files;
-      this.fileName = file.name
+      this.fileName = file[0].name;
       if (file.length === 0) {
         return;
       }
       let reader = new FileReader();
       if (typeof FileReader === "undefined") {
-        this.$message.info('您的浏览器不支持FileReader接口')
+        this.$message.info("您的浏览器不支持FileReader接口");
         return;
       }
-      reader.readAsText(file[0]);
+      reader.readAsArrayBuffer(file[0]);
       reader.onload = function(e) {
         console.log("文件内容");
         console.log(e.target.result);
-        this.fileContent = e.target.result
 
+        const blob = new Blob([e.target.result], {
+          type: "application/octet-stream;charset=UTF-8"
+        });
+        var url = URL.createObjectURL(blob);
 
-        const blob = new Blob([this.fileContent], {type : 'text/plain'})
-        var url = URL.createObjectURL(blob)
-        console.log(url)
+        this.ws.send(
+          JSON.stringify({
+            msg: url,
+            type: "chatMsg",
+            isFile: true,
+            fileName: this.fileName,
+            sendUser: this.username,
+            date: new Date().toLocaleString().toString()
+          })
+        );
+      }.bind(this);
+
+      reader.onerror = function(error) {
+        console.log("Error: ", error);
       };
+    },
+
+    // 打开聊天记录
+    showChatRecord() {
+      this.$refs.chatRecord.isShow = !this.$refs.chatRecord.isShow;
+    },
+
+    showVideoCall() {
+      this.$refs.videoCall.isShow = !this.$refs.videoCall.isShow;
     }
   }
 };

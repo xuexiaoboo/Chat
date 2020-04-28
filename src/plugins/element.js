@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { Card, Button, Form, FormItem, Input, Message, Container, Header, Aside, Main, PageHeader, Menu, Submenu, MenuItemGroup, MenuItem, Upload } from 'element-ui'
+import { Card, Button, Form, FormItem, Input, Message, Notification, Container, Header, Aside, Main, PageHeader, Menu, Submenu, MenuItemGroup, MenuItem, Upload } from 'element-ui'
 
 Vue.use(Button)
 Vue.use(Form)
@@ -16,3 +16,4 @@ Vue.use(MenuItem)
 Vue.use(Card)
 Vue.use(Upload)
 Vue.prototype.$message = Message
+Vue.prototype.$notify = Notification

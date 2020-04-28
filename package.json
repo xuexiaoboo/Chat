@@ -15,6 +15,7 @@
     "jquery": "^3.4.1",
     "nodejs-websocket": "^1.7.2",
     "socket.io": "^2.3.0",
+    "trtc-js-sdk": "^4.3.13",
     "vue": "^2.6.11",
     "vue-router": "^3.1.5",
     "vue-socket.io": "^3.0.7",
